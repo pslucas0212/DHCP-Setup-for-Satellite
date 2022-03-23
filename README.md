@@ -13,6 +13,7 @@ Komapi_key.+157+56839
 Copy the secret from the key.
 ```
 # cat Komapi_key.+*.private |grep ^Key|cut -d ' ' -f2
+jNSE5YI3H1A8Oj/tkV4...A2ZOHb6zv315CkNAY7DMYYCj48Umw==
 ```
 
 Add the following information to the /ect/dhcp/dhcpd.conf file.
@@ -24,6 +25,18 @@ key omapi_key {
 };
 omapi-key omapi_key;
 ```
+On the Satellite server gather foreman user UID and GID.
+```
+# id -u foreman
+987
+# id -g foreman
+981
+```
 
+On the server hosting dns and dhcp create the foreman userid and group.
+```
+# groupadd -g 981 foreman
+# useradd -u 987 -g 981 -s /sbin/nologin foreman
+```
 
 
