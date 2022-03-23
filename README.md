@@ -124,5 +124,69 @@ Change the file owner:
 # chown -R foreman-proxy /mnt/nfs
 ```
 
+Verify communication with the NFS server and the Remote Procedure Call (RPC) communication paths
+```
+# showmount -e ns02.example.com
+Export list for ns02.example.com:
+/exports/var/lib/dhcpd 10.1.10.254
+/exports/etc/dhcp      10.1.10.254
+/exports               10.1.10.254
+rpcinfo -p 10.1.10.254
+   program vers proto   port  service
+    100000    4   tcp    111  portmapper
+    100000    3   tcp    111  portmapper
+    100000    2   tcp    111  portmapper
+    100000    4   udp    111  portmapper
+    100000    3   udp    111  portmapper
+    100000    2   udp    111  portmapper
+```
+
+
+Add the following lines to the /etc/fstab file:
+```
+ns02.example.com:/exports/etc/dhcp /mnt/nfs/etc/dhcp nfs
+ro,vers=3,auto,nosharecache,context="system_u:object_r:dhcp_etc_t:s0" 0 0
+
+ns02.example.com:/exports/var/lib/dhcpd /mnt/nfs/var/lib/dhcpd nfs
+ro,vers=3,auto,nosharecache,context="system_u:object_r:dhcpd_state_t:s0" 0 0
+```
+
+Mount the file systems on /etc/fstab:
+```
+# mount -a
+```
+
+To verify that the foreman-proxy user can access the files that are shared over the network, display the DHCP configuration and lease files:
+```
+# su foreman-proxy -s /bin/bash
+bash-4.2$ cat /mnt/nfs/etc/dhcp/dhcpd.conf
+bash-4.2$ cat /mnt/nfs/var/lib/dhcpd/dhcpd.leases
+bash-4.2$ exit
+```
+
+ Enter the satellite-installer command to make the following persistent changes to the /etc/foreman-proxy/settings.d/dhcp.yml file:
+```
+# satellite-installer --foreman-proxy-dhcp=true \
+--foreman-proxy-dhcp-provider=remote_isc \
+--foreman-proxy-plugin-dhcp-remote-isc-dhcp-config /mnt/nfs/etc/dhcp/dhcpd.conf \
+--foreman-proxy-plugin-dhcp-remote-isc-dhcp-leases /mnt/nfs/var/lib/dhcpd/dhcpd.leases \
+--foreman-proxy-plugin-dhcp-remote-isc-key-name=omapi_key \
+--foreman-proxy-plugin-dhcp-remote-isc-key-secret=BWbZEXP3sMp2UHnA81uofNxAyUUEWPV7JlrNmE8p1S+XbKozKPlxDq542NRu2ERq7I/KbacdcMiECIRRoCoEAA== \
+--foreman-proxy-plugin-dhcp-remote-isc-omapi-port=7911 \
+--enable-foreman-proxy-plugin-dhcp-remote-isc \
+--foreman-proxy-dhcp-server=ns02.example.com
+```
+
+ Restart the foreman-proxy service:
+```
+# systemctl restart foreman-proxy
+```
+
+Log in to the Satellite Server web UI.
+
+Navigate to Infrastructure > Capsules, locate the Satellite Server, and from the list in the Actions column, select Refresh.
+
+Associate the DHCP service with the appropriate subnets and domain. 
+
 ## References
 [Chapter 5. Configuring Satellite Server with External Services](https://access.redhat.com/documentation/en-us/red_hat_satellite/6.9/html/installing_satellite_server_from_a_connected_network/configuring-external-services)
