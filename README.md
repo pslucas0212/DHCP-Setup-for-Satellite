@@ -16,7 +16,8 @@ Copy the secret from the key.
 ```
 
 Add the following information to the /ect/dhcp/dhcpd.conf file.
-```omapi-port 7911;
+```
+omapi-port 7911;
 key omapi_key {
         algorithm HMAC-MD5;
         secret "jNSE5YI3H1A8Oj/tkV4...A2ZOHb6zv315CkNAY7DMYYCj48Umw==";
