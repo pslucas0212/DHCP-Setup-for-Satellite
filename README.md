@@ -1,6 +1,6 @@
 # DHCP Setup for Satellite
 
-Home article page - [Configuring External DNS and DHCP for Satellite](https://github.com/pslucas0212/Configuring-External-DNS-and-DHCP-for-Satellite/blob/main/README.md)
+Home article page - [External DNS and DHCP with Satellite](https://github.com/pslucas0212/External-DNS-and-DHCP-with-Satellite)
 
 Satellite and the DHCP server reside on different servers.  In this article we will walk through configuring the DHCP server to work with Satellite.  
 
